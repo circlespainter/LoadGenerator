@@ -1,80 +1,61 @@
 package com.webQ.controller;
 
-
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.util.Map;
-import java.util.concurrent.Future;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
-import org.apache.http.impl.nio.client.HttpAsyncClients;
+import co.paralleluniverse.fibers.Fiber;
+import co.paralleluniverse.fibers.SuspendExecution;
+import com.webQ.service.HelloWorldService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.webQ.service.HelloWorldService;
-
-import co.paralleluniverse.fibers.Fiber;
-import co.paralleluniverse.fibers.SuspendExecution;
-import co.paralleluniverse.fibers.Suspendable;
-import co.paralleluniverse.fibers.httpasyncclient.FiberCloseableHttpAsyncClient;
-import co.paralleluniverse.springframework.web.servlet.config.annotation.FiberWebMvcConfigurationSupport;
-import co.paralleluniverse.strands.Strand;
+import java.util.Map;
 
 @Controller
 public class MyClass {
-	
-	private final Logger logger = LoggerFactory.getLogger(MyClass.class);
-	private final HelloWorldService helloWorldService;
-	@Autowired
-	public MyClass(HelloWorldService helloWorldService) {
-	this.helloWorldService = helloWorldService;
-	}
-	@RequestMapping(value = "/", method = RequestMethod.GET)
-	public String index(Map<String, Object> model) {
-	logger.debug("index() is executed!");
-	model.put("title", helloWorldService.getTitle(""));
-	model.put("msg", helloWorldService.getDesc());
-	return "index";
-	}
-	
-	@RequestMapping(value = "/hello/{name:.+}", method = RequestMethod.GET)
-	public ModelAndView hello(@PathVariable("name") String name) throws SuspendExecution, InterruptedException {
-	Fiber.sleep(10);
-	logger.debug("hello() is executed - $name {}", name);
-	ModelAndView model = new ModelAndView();
-	model.setViewName("index");
-	model.addObject("title", helloWorldService.getTitle(name));
-	model.addObject("msg", helloWorldService.getDesc());
-	return model;
-	}
-	
-	@RequestMapping(value = "/fiber", method = RequestMethod.GET)
-	public String hello() throws SuspendExecution, InterruptedException {
-	System.out.println("doneeeeeeeeeeeeeeeeeeeeeee");
-		for(int i=0;i<10;++i){
-		Fiber<Void> f1 = new Fiber<Void>(() -> {
-			 
-			 Fiber.sleep(10);
-			  System.out.println(Fiber.currentFiber().getName() + "done");
-			 
-			  }).start();
-		}
-		/*//HttpGet request = new HttpGet("http://10.129.26.133:8000/proxy1?limit=515000");
+
+  private final Logger logger = LoggerFactory.getLogger(MyClass.class);
+  private final HelloWorldService helloWorldService;
+
+  @Autowired
+  public MyClass(HelloWorldService helloWorldService) {
+    this.helloWorldService = helloWorldService;
+  }
+
+  @RequestMapping(value = "/", method = RequestMethod.GET)
+  public String index(Map<String, Object> model) {
+    logger.debug("index() is executed!");
+    model.put("title", helloWorldService.getTitle(""));
+    model.put("msg", helloWorldService.getDesc());
+    return "index";
+  }
+
+  @RequestMapping(value = "/hello/{name:.+}", method = RequestMethod.GET)
+  public ModelAndView hello(@PathVariable("name") String name) throws SuspendExecution, InterruptedException {
+    Fiber.sleep(10);
+    logger.debug("hello() is executed - $name {}", name);
+    ModelAndView model = new ModelAndView();
+    model.setViewName("index");
+    model.addObject("title", helloWorldService.getTitle(name));
+    model.addObject("msg", helloWorldService.getDesc());
+    return model;
+  }
+
+  @RequestMapping(value = "/fiber", method = RequestMethod.GET)
+  public String hello() throws SuspendExecution, InterruptedException {
+    System.out.println("doneeeeeeeeeeeeeeeeeeeeeee");
+    for (int i = 0; i < 10; ++i) {
+      Fiber<Void> f1 = new Fiber<Void>(() -> {
+
+        Fiber.sleep(10);
+        System.out.println(Fiber.currentFiber().getName() + "done");
+
+      }).start();
+    }
+    /*//HttpGet request = new HttpGet("http://10.129.26.133:8000/proxy1?limit=515000");
 		HttpGet request = new HttpGet("http://www.google.com");
 		for(int i=0;i<10;++i){
 		Fiber<Void> f1 = new Fiber<Void>(() -> {
@@ -120,7 +101,7 @@ public class MyClass {
 		}
 			  }).start();
 		}*/
-		return "hello";
-	}
+    return "hello";
+  }
 
 }
