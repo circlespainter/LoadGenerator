@@ -26,8 +26,9 @@ public class MyClass {
   }
 
   @RequestMapping(value = "/", method = RequestMethod.GET)
-  public String index(Map<String, Object> model) {
-    logger.debug("index() is executed!");
+  public String index(Map<String, Object> model) throws SuspendExecution, InterruptedException {
+		Fiber.sleep(10);
+		logger.debug("index() is executed!");
     model.put("title", helloWorldService.getTitle(""));
     model.put("msg", helloWorldService.getDesc());
     return "index";
